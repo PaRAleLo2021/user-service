@@ -4,10 +4,12 @@ import IUser from '../interfaces/user';
 
 const UserSchema: Schema = new Schema(
     {
-        username: {type: String, required: true},
-        password: {type: String, required: true},
-        email: {type: String, required: true},
-        extraInformation: {type: String}
+        username: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid'], index: true},
+        password: {type: String, required: [true, "can't be blank"]},
+        salt: {type: String},
+        hash: {type: String},
+        email: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
+        score: {type: Number}
     },
     {
         timestamps: true
@@ -15,8 +17,8 @@ const UserSchema: Schema = new Schema(
 );
 
 UserSchema.post<IUser>('save', function () {
-    this.extraInformation = "This is some extra info that was put onto this entry after the save :))";
-    logging.info('Mongo', 'Checkout the user we just saved: ', this);
+    this.score = 0;
+    logging.info('Mongo', 'User details set', this);
 })
 
 export default mongoose.model<IUser>('User', UserSchema);
