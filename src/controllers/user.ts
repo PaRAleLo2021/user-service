@@ -1,8 +1,24 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
+import logging from '../config/logging';
 import User from '../models/user';
+var crypto = require('crypto');
 
-const NAMESPACE = 'Sample Controller';
+const NAMESPACE = 'Users Controller';
+
+const validateToken = (req: Request, res: Response, next: NextFunction) => {
+    logging.info(NAMESPACE, "Token validated, user authorized");
+
+    return res.status(200).json({
+        message: "Authorized"
+    })
+};
+
+const login = (req: Request, res: Response, next: NextFunction) => {
+    let { username, password } =req.body;
+
+    
+};
 
 const createUser = (req: Request, res: Response, next: NextFunction) => {
     let { username, password, email } = req.body;
@@ -17,6 +33,7 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
     return user
         .save()
         .then((result) => {
+            console.log("here");
             return res.status(201).json({
                 user: result
             });

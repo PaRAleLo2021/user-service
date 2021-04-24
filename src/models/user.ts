@@ -20,7 +20,7 @@ const UserSchema: Schema = new Schema(
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'});
 
-UserSchema.post<IUser>('save', function () {
+UserSchema.pre<IUser>('save', function () {
     this.salt = crypto.randomBytes(16).toString('hex');
     this.hash = crypto.pbkdf2Sync(this.password, this.salt, 10000, 512, 'sha512').toString('hex');
     this.password = "";
