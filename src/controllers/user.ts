@@ -2,9 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import logging from '../config/logging';
 import User from '../models/user';
-var crypto = require('crypto');
+import crypto from 'crypto';
+import signJWT from '../functions/signJWT'
 
-const NAMESPACE = 'Users Controller';
+const NAMESPACE = 'Users';
 
 const validateToken = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, "Token validated, user authorized");
@@ -15,12 +16,54 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const login = (req: Request, res: Response, next: NextFunction) => {
-    let { username, password } =req.body;
+    let { email, password } =req.body;
 
+    User.find({email: email})
+    .exec()
+    .then(users => {
+        if(users.length!== 1){
+            return res.status(401).json({
+                message: users.length+'Unauthorized'
+            });
+        }
     
+        var hash = "";
+        hash = crypto.pbkdf2Sync(password, users[0].salt, 10000, 512, 'sha512').toString('hex');
+
+        if(hash == users[0].hash){
+            signJWT(users[0], (_error, token) => {
+                if(_error){
+                    logging.error(NAMESPACE, 'Unable to sign token: ', _error);
+
+                    return res.status(401).json({
+                        email: email,
+                        message: 'Unauthorized',
+                        error: _error
+                    });
+                }
+                if(token){
+                    return res.status(200).json({
+                        message: 'Auth Successful',
+                        token,
+                        user: users[0]
+                    });
+                }
+            });
+        }else{
+            return res.status(401).json({
+                message: 'Unauthorized'
+            });
+        }
+    })
+    .catch(error => {
+        return res.status(500).json({
+            message: error.message,
+            error
+        });
+    })
 };
 
-const createUser = (req: Request, res: Response, next: NextFunction) => {
+const register = (req: Request, res: Response, next: NextFunction) => {
     let { username, password, email } = req.body;
 
     const user = new User({
@@ -48,6 +91,7 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
 
 const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
     User.find()
+    .select('-password -hash -salt')
     .exec()
         .then((users) => {
             return res.status(200).json({
@@ -63,4 +107,4 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
         });
 };
 
-export default { createUser, getAllUsers };
+export default { validateToken, login, register, getAllUsers };

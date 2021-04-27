@@ -2,7 +2,7 @@ import mongoose,{ Schema } from 'mongoose';
 import logging from '../config/logging';
 import IUser from '../interfaces/user';
 var uniqueValidator = require('mongoose-unique-validator');
-var crypto = require('crypto');
+import crypto from 'crypto';
 
 const UserSchema: Schema = new Schema(
     {

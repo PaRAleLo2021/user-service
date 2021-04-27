@@ -50,7 +50,7 @@ router.use((req, res, next) => {
 });
 
 /** Routes go here */
-router.use('/api/users', userRoutes);
+router.use('/users', userRoutes);
 
 /** Error handling */
 router.use((req, res, next) => {
