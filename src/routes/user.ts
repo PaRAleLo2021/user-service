@@ -9,6 +9,7 @@ router.post('/login', controller.login);
 router.get('/get/all', controller.getAllUsers);
 router.get('/validate', extractJWT, controller.validateToken);
 router.patch('/patch', controller.updateUser);
+router.patch('/patch/score', controller.updateScore);
 router.delete('/delete', controller.deleteUser);
 
 

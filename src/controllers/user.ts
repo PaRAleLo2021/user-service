@@ -107,25 +107,6 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
         });
 };
 
-//to be implemented
-const updateScore = (req: Request, res: Response, next: NextFunction) => {
-    User.find()
-    .select('-password -hash -salt')
-    .exec()
-        .then((users) => {
-            return res.status(200).json({
-                users: users,
-                count: users.length
-            });
-        })
-        .catch((error) => {
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
-        });
-};
-
 const updateUser = (req: Request, res: Response, next: NextFunction) => {
     let { _id, username, email, password} = req.body;
 
@@ -179,4 +160,24 @@ const deleteUser = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export default { validateToken, login, register, getAllUsers, updateUser, deleteUser};
+const updateScore = (req: Request, res: Response, next: NextFunction) => {
+    let { _id, score} = req.body;
+
+    var user: Object;
+    
+    User.findByIdAndUpdate(_id,{$set: {score: score}}, { new: true }, function(err, result){
+        if(err){
+            return res.status(500).json({
+                message: err.message,
+                err
+            });
+        }
+        else{
+            return res.status(201).json({
+                user: result
+            });
+        }
+    });
+};
+
+export default { validateToken, login, register, getAllUsers, updateUser, deleteUser, updateScore};
