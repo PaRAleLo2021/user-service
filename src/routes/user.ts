@@ -9,5 +9,7 @@ router.post('/login', controller.login);
 router.get('/get/all', controller.getAllUsers);
 router.get('/validate', extractJWT, controller.validateToken);
 router.patch('/patch', controller.updateUser);
+router.delete('/delete', controller.deleteUser);
+
 
 export = router;

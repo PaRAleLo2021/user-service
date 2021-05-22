@@ -162,4 +162,21 @@ const updateUser = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export default { validateToken, login, register, getAllUsers, updateUser};
+const deleteUser = (req: Request, res: Response, next: NextFunction) => {
+    let {_id} = req.body;
+    User.findByIdAndDelete(_id, {}, function(err: any){
+        if(err){
+            return res.status(500).json({
+                message: err.message,
+                err
+            });
+        }
+        else{
+            return res.status(201).json({
+                message: "Successful",
+            });
+        }
+    });
+};
+
+export default { validateToken, login, register, getAllUsers, updateUser, deleteUser};
