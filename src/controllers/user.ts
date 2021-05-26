@@ -23,7 +23,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
     .then(users => {
         if(users.length!== 1){
             return res.status(401).json({
-                message: users.length+'Unauthorized'
+                message: 'Email doesn\'t exist. Try again or Register.'
             });
         }
     
@@ -51,7 +51,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
             });
         }else{
             return res.status(401).json({
-                message: 'Unauthorized'
+                message: 'Wrong Password.'
             });
         }
     })
